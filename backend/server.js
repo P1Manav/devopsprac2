@@ -14,7 +14,6 @@ admin.initializeApp({
 const db = admin.firestore();
 const users = db.collection("users");
 
-// CRUD Routes
 app.get("/api/users", async (req, res) => {
   const snapshot = await users.get();
   res.json(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
