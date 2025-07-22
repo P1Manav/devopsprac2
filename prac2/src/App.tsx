@@ -1,15 +1,15 @@
-
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 
-const API = "http://localhost:3000/api/users"; 
+const API = "http://localhost:3000/api/users";
 
 export default function App() {
   const [method, setMethod] = useState("GET");
   const [userId, setUserId] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [response, setResponse] = useState(null);
+  const [response, setResponse] = useState<null | string | any>(null);
+
 
   const handleSubmit = async () => {
     try {
@@ -32,7 +32,11 @@ export default function App() {
       }
       setResponse(res.data);
     } catch (err) {
-      setResponse(err.response?.data || "Request failed");
+      if (axios.isAxiosError(err)) {
+        setResponse(err.response?.data || "Request failed");
+      } else {
+        setResponse("An unknown error occurred");
+      }
     }
   };
 
@@ -85,7 +89,7 @@ export default function App() {
 
       <div style={{ marginTop: 20 }}>
         <h3>Response:</h3>
-        <pre style={{ backgroundColor: "#000", padding: 10 }}>
+        <pre style={{ backgroundColor: "#000", padding: 10, color: "#fff" }}>
           {JSON.stringify(response, null, 2)}
         </pre>
       </div>
