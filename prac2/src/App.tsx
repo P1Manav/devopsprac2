@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 
-const API = "http://localhost:3000/api/users";
+const API = "https://devopsprac2.onrender.com";
 
 export default function App() {
   const [method, setMethod] = useState("GET");
