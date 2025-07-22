@@ -1,56 +1,47 @@
-const express = require('express');
-const cors = require('cors'); 
+const express = require("express");
+const cors = require("cors");
+const admin = require("firebase-admin");
 const app = express();
 
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
-let users = [
-  { id: 1, name: "Alice", email: "alice@example.com" },
-  { id: 2, name: "Bob", email: "bob@example.com" }
-];
+// FIREBASE SETUP
+const serviceAccount = JSON.parse(process.env.FIREBASE_KEY);
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+const db = admin.firestore();
+const users = db.collection("users");
 
-app.get('/api/users', (req, res) => {
-  res.json(users);
+// CRUD Routes
+app.get("/api/users", async (req, res) => {
+  const snapshot = await users.get();
+  res.json(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
 });
 
-app.get('/api/users/:id', (req, res) => {
-  const user = users.find(u => u.id === parseInt(req.params.id));
-  if (!user) return res.status(404).send("User not found");
-  res.json(user);
+app.get("/api/users/:id", async (req, res) => {
+  const doc = await users.doc(req.params.id).get();
+  if (!doc.exists) return res.status(404).send("User not found");
+  res.json({ id: doc.id, ...doc.data() });
 });
 
-app.post('/api/users', (req, res) => {
+app.post("/api/users", async (req, res) => {
   const { name, email } = req.body;
-  const newUser = {
-    id: users.length + 1,
-    name,
-    email
-  };
-  users.push(newUser);
-  res.status(201).json(newUser);
+  const ref = await users.add({ name, email });
+  res.status(201).json({ id: ref.id, name, email });
 });
 
-app.put('/api/users/:id', (req, res) => {
-  const user = users.find(u => u.id === parseInt(req.params.id));
-  if (!user) return res.status(404).send("User not found");
-
-  const { name, email } = req.body;
-  user.name = name || user.name;
-  user.email = email || user.email;
-
-  res.json(user);
+app.put("/api/users/:id", async (req, res) => {
+  await users.doc(req.params.id).update(req.body);
+  const updated = await users.doc(req.params.id).get();
+  res.json({ id: updated.id, ...updated.data() });
 });
 
-app.delete('/api/users/:id', (req, res) => {
-  const index = users.findIndex(u => u.id === parseInt(req.params.id));
-  if (index === -1) return res.status(404).send("User not found");
-
-  const deletedUser = users.splice(index, 1);
-  res.json(deletedUser[0]);
+app.delete("/api/users/:id", async (req, res) => {
+  await users.doc(req.params.id).delete();
+  res.json({ message: "Deleted" });
 });
 
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server started on ${PORT}`));
