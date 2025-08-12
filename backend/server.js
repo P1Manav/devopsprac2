@@ -7,7 +7,8 @@ app.use(cors());
 app.use(express.json());
 
 // FIREBASE SETUP
-const serviceAccount = require("./firebase-key.json");
+const path = require("path");
+const serviceAccount = require(path.join(__dirname, "firebase-key.json"));
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
