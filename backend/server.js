@@ -1,21 +1,18 @@
-require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const admin = require("firebase-admin");
-
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
 // FIREBASE SETUP
-const serviceAccount = JSON.parse(process.env.FIREBASE_KEY);
+const serviceAccount = require("./firebase-key.json");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
-
 const db = admin.firestore();
 const users = db.collection("users");
-
 
 app.get("/api/users", async (req, res) => {
   const snapshot = await users.get();
