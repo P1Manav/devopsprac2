@@ -7,7 +7,8 @@ app.use(cors());
 app.use(express.json());
 
 // FIREBASE SETUP
-const serviceAccount = JSON.parse(process.env.FIREBASE_KEY);
+const serviceAccount = JSON.parse(Buffer.from(process.env.FIREBASE_KEY_BASE64, "base64").toString("utf8")
+);
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
