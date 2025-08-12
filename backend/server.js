@@ -20,6 +20,12 @@ const serviceAccount = {
   client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL,
   universe_domain: process.env.FIREBASE_UNIVERSE_DOMAIN
 };
+console.log("Loaded env vars:", {
+  type: process.env.FIREBASE_TYPE,
+  project_id: process.env.FIREBASE_PROJECT_ID,
+  client_email: process.env.FIREBASE_CLIENT_EMAIL,
+  private_key_present: !!process.env.FIREBASE_PRIVATE_KEY
+});
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
