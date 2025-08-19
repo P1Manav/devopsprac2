@@ -46,10 +46,9 @@ app.get("/api/users/:id", async (req, res) => {
 });
 
 app.post("/api/users", async (req, res) => {
-  const { id, name, email } = req.body;
-  const userId = String(id);
-  await users.doc(userId).set({ name, email });
-  res.status(201).json({ id: userId, name, email });
+  const { name, email } = req.body;
+  const ref = await users.add({ name, email });
+  res.status(201).json({ id: ref.id, name, email });
 });
 
 
