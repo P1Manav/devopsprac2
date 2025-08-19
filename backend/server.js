@@ -46,10 +46,12 @@ app.get("/api/users/:id", async (req, res) => {
 });
 
 app.post("/api/users", async (req, res) => {
-  const { name, email } = req.body;
-  const ref = await users.add({ name, email });
-  res.status(201).json({ id: ref.id, name, email });
+  const { id, name, email } = req.body;
+  const userId = String(id);
+  await users.doc(userId).set({ name, email });
+  res.status(201).json({ id: userId, name, email });
 });
+
 
 app.put("/api/users/:id", async (req, res) => {
   await users.doc(req.params.id).update(req.body);
